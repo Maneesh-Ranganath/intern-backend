@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/projects")
@@ -15,10 +16,16 @@ public class ProjectController {
     @Autowired
     private ProjectRepository projectRepository;
 
+    // Base Health Endpoint
+    @GetMapping("/health")
+    public String healthCheck() {
+        return "Clean Intern Backend is running successfully!";
+    }
+
     // Student Submission Form Endpoint
     @PostMapping
     public ProjectSubmission submitProject(@RequestBody ProjectSubmission submission) {
-        if (submission.getStatus() == null) {
+        if (submission.getStatus() == null || submission.getStatus().trim().isEmpty()) {
             submission.setStatus("PENDING");
         }
         return projectRepository.save(submission);
@@ -32,7 +39,8 @@ public class ProjectController {
 
     // Host Mode Endpoint (Update status)
     @PutMapping("/{id}/status")
-    public ProjectSubmission updateStatus(@PathVariable Long id, @RequestParam String status) {
+    public ProjectSubmission updateStatus(@PathVariable Long id, @RequestBody Map<String, String> body) {
+        String status = body.get("status");
         ProjectSubmission submission = projectRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Submission not found with id: " + id));
         submission.setStatus(status);
