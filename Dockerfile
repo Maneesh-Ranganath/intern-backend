@@ -2,9 +2,14 @@
 FROM eclipse-temurin:21-jdk-alpine AS builder
 WORKDIR /app
 
-# Copy Maven wrapper and POM first to leverage layer caching
+# Copy Maven wrapper and POM
 COPY .mvn/ .mvn
 COPY mvnw pom.xml ./
+
+# Grant execute permissions to Maven wrapper script
+RUN chmod +x mvnw
+
+# Download dependencies offline
 RUN ./mvnw dependency:go-offline
 
 # Copy source code and build the executable JAR
