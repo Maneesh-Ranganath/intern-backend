@@ -37,10 +37,10 @@ public class ProjectController {
         return projectRepository.findAll();
     }
 
-    // Host Mode Endpoint (Update status)
+    // Host Mode Endpoint (Update status) - Accepts JSON Body
     @PutMapping("/{id}/status")
     public ProjectSubmission updateStatus(@PathVariable Long id, @RequestBody Map<String, String> body) {
-        String status = body.get("status");
+        String status = (body != null && body.containsKey("status")) ? body.get("status") : "PENDING";
         ProjectSubmission submission = projectRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Submission not found with id: " + id));
         submission.setStatus(status);
